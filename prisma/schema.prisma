@@ -9,3 +9,21 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Team {
+  id                Int      @id @default(autoincrement())
+  name              String
+  registrationDate  DateTime
+  firstTeamMatches  Match[]  @relation("firstTeam")
+  secondTeamMatches Match[]  @relation("secondTeam")
+}
+
+model Match {
+  id                    Int  @id @default(autoincrement())
+  firstTeam             Team @relation("firstTeam", fields: [firstTeamId], references: [id])
+  firstTeamId           Int
+  secondTeam            Team @relation("secondTeam", fields: [secondTeamId], references: [id])
+  secondTeamId          Int
+  firstTeamGoalsScored  Int
+  secondTeamGoalsScored Int
+}
