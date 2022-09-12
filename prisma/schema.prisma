@@ -12,7 +12,7 @@ datasource db {
 
 model Team {
   id                Int      @id @default(autoincrement())
-  name              String
+  name              String   @unique
   registrationDate  DateTime
   group             Int
   firstTeamMatches  Match[]  @relation("firstTeam")

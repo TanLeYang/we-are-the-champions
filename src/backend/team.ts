@@ -15,3 +15,11 @@ export async function createTeams(teams: CreateTeam[]) {
     )
   )
 }
+
+export async function getTeamByName(name: string) {
+  return prisma.team.findUnique({
+    where: {
+      name: name
+    }
+  })
+}
