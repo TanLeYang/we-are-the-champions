@@ -1,18 +1,8 @@
 import { Table, TableCaption, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react"
-
-type Results = {
-  teamName: string
-  wins: number
-  draws: number
-  losses: number
-  points: number
-  goalsScored: number
-  alternatePoints: number
-  didAdvance: boolean
-}
+import { Result } from "../types/result"
 
 type ResultTableProps = {
-  results: Results[]
+  results: Result[]
 }
 
 const ResultTable: React.FC<ResultTableProps> = ({ results }) => {
