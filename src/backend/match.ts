@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import { prisma } from "../db/client"
 
 type CreateMatch = {
@@ -15,4 +16,18 @@ export async function createMatches(matches: CreateMatch[]) {
       })
     )
   )
+}
+
+const matchWithTeams = Prisma.validator<Prisma.MatchArgs>()({
+  include: {
+    firstTeam: true,
+    secondTeam: true
+  }
+})
+
+export type MatchWithTeams = Prisma.MatchGetPayload<typeof matchWithTeams>
+
+export async function getAllMatchesWithTeams(): Promise<MatchWithTeams[]> {
+  const matches = await prisma.match.findMany(matchWithTeams)
+  return matches || []
 }
