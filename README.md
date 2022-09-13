@@ -10,7 +10,7 @@ Prerequisites: Docker
 
 ### Quick Start
 
-`docker compose -f docker-compose.dev up`
+`docker compose -f docker-compose.dev.yml up`
 App will be accessible at localhost:3000
 
 ### Developing
