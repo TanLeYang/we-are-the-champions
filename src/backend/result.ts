@@ -16,6 +16,9 @@ export async function computeResults(allMatches: MatchWithTeams[]) {
 
 type TeamStats = {
   teamName: string
+  wins: number
+  draws: number
+  losses: number
   points: number
   totalGoals: number
   alternatePoints: number
@@ -25,28 +28,32 @@ type TeamStats = {
 function computeGroupResults(groupMatches: MatchWithTeams[]) {
   const teamStats: Map<string, TeamStats> = new Map()
 
-  const pointsEarned = (goalsScored: number, opponentGoalsScored: number, alternate: boolean) => {
-    if (goalsScored > opponentGoalsScored) {
-      return alternate ? 5 : 3
-    } else if (goalsScored == opponentGoalsScored) {
-      return alternate ? 3 : 1
-    } else {
-      return alternate ? 1 : 0
-    }
-  }
-
   const updateStats = (team: Team, goalsScored: number, opponentGoalsScored: number) => {
     let stats = teamStats.get(team.name) || {
       teamName: team.name,
+      wins: 0,
+      draws: 0,
+      losses: 0,
       points: 0,
       totalGoals: 0,
       alternatePoints: 0,
       registrationDate: team.registrationDate
     }
 
-    stats.points += pointsEarned(goalsScored, opponentGoalsScored, false)
-    stats.alternatePoints += pointsEarned(goalsScored, opponentGoalsScored, true)
     stats.totalGoals += goalsScored
+    if (goalsScored > opponentGoalsScored) {
+      stats.wins += 1
+      stats.points += 3
+      stats.alternatePoints += 5
+    } else if (goalsScored == opponentGoalsScored) {
+      stats.draws += 1
+      stats.points += 1
+      stats.alternatePoints += 3
+    } else {
+      stats.losses += 1
+      stats.alternatePoints += 1
+    }
+
     teamStats.set(team.name, stats)
   }
 
