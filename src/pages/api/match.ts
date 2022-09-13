@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { createMatches } from "../../backend/match"
 import { getTeamByName } from "../../backend/team"
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case "POST":
-      handleAddMatches(req, res)
+      await handleAddMatches(req, res)
       break
   }
 }
