@@ -43,10 +43,10 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
   const [isLoadingResults, setIsLoadingResults] = useState(false)
   const errorToast = useToast()
 
-  const postData = async (resource: string, data: any) => {
+  const submitData = async (method: string, resource: string, data: any) => {
     try {
       const resp = (await fetch(`/api/${resource}`, {
-        method: "POST",
+        method,
         headers: {
           "Content-Type": "application/json"
         },
@@ -94,7 +94,7 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         }
       })
 
-    await postData("team", teamsToRegister)
+    await submitData("POST", "team", teamsToRegister)
     setIsLoadingResults(false)
   }
 
@@ -114,61 +114,77 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         }
       })
 
-    await postData("match", matchesToSubmit)
+    await submitData("POST", "match", matchesToSubmit)
+    setIsLoadingResults(false)
+  }
+
+  const handleReset = async () => {
+    setIsLoadingResults(true)
+    await submitData("DELETE", "result", null)
     setIsLoadingResults(false)
   }
 
   return (
-    <Flex
-      direction="row"
-      justifyContent="center"
-      alignItems="center"
-      min-h="100vh"
-      gap="10vw"
-      wrap="wrap"
-    >
-      <Box>
-        <VStack alignItems="leading" marginBottom="10">
-          <Heading> We are the Champions ⚽ </Heading>
-          <Text> 12 teams compete for the grand prize of honour and glory </Text>
-        </VStack>
-        <VStack alignItems="leading" marginBottom="5">
-          <Text> Register Teams: </Text>
-          <Textarea
-            value={teamRegistrationText}
-            onChange={(e) => setTeamRegistrationText(e.target.value)}
-            size="md"
-            placeholder="Each line: <Team Name> <Registration Date> <Group Number>"
-          />
-          <Flex>
-            <Spacer />
-            <Button isLoading={isLoadingResults} colorScheme="green" onClick={handleRegisterTeams}>
-              Register
-            </Button>
-          </Flex>
-        </VStack>
-        <VStack alignItems="leading">
-          <Text> Input Results: </Text>
-          <Textarea
-            value={matchesText}
-            onChange={(e) => setMatchesText(e.target.value)}
-            size="md"
-            placeholder="Each line: <Team A Name> <Team B Name> <Team A goals scored> <Team B goals scored>"
-          />
-          <Flex>
-            <Spacer />
-            <Button isLoading={isLoadingResults} colorScheme="blue" onClick={handleSubmitMatches}>
-              Submit Results
-            </Button>
-          </Flex>
-        </VStack>
-      </Box>
+    <>
+      <Flex
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        minH="100vh"
+        gap="10vw"
+        wrap="wrap"
+      >
+        <Box>
+          <VStack alignItems="leading" marginBottom="10">
+            <Heading> We are the Champions ⚽ </Heading>
+            <Text> 12 teams compete for the grand prize of honour and glory </Text>
+          </VStack>
+          <VStack alignItems="leading" marginBottom="5">
+            <Text> Register Teams: </Text>
+            <Textarea
+              value={teamRegistrationText}
+              onChange={(e) => setTeamRegistrationText(e.target.value)}
+              size="md"
+              placeholder="Each line: <Team Name> <Registration Date> <Group Number>"
+            />
+            <Flex>
+              <Spacer />
+              <Button
+                isLoading={isLoadingResults}
+                colorScheme="green"
+                onClick={handleRegisterTeams}
+              >
+                Register
+              </Button>
+            </Flex>
+          </VStack>
+          <VStack alignItems="leading" marginBottom="5">
+            <Text> Input Results: </Text>
+            <Textarea
+              value={matchesText}
+              onChange={(e) => setMatchesText(e.target.value)}
+              size="md"
+              placeholder="Each line: <Team A Name> <Team B Name> <Team A goals scored> <Team B goals scored>"
+            />
+            <Flex>
+              <Spacer />
+              <Button isLoading={isLoadingResults} colorScheme="blue" onClick={handleSubmitMatches}>
+                Submit Results
+              </Button>
+            </Flex>
+          </VStack>
 
-      <Flex direction="column" gap="3vh">
-        <ResultTable results={groupOneResults} groupNumber={1} />
-        <ResultTable results={groupTwoResults} groupNumber={2} />
+          <Button isLoading={isLoadingResults} colorScheme="red" onClick={handleReset}>
+            Reset
+          </Button>
+        </Box>
+
+        <Flex direction="column" gap="3vh">
+          <ResultTable results={groupOneResults} groupNumber={1} />
+          <ResultTable results={groupTwoResults} groupNumber={2} />
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
 

@@ -18,6 +18,10 @@ export async function createMatches(matches: CreateMatch[]) {
   )
 }
 
+export async function deleteAllMatches() {
+  return prisma.match.deleteMany({})
+}
+
 const matchWithTeams = Prisma.validator<Prisma.MatchArgs>()({
   include: {
     firstTeam: true,

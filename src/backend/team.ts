@@ -16,6 +16,10 @@ export async function createTeams(teams: CreateTeam[]) {
   )
 }
 
+export async function deleteAllTeams() {
+  return prisma.team.deleteMany({})
+}
+
 export async function getTeamByName(name: string) {
   return prisma.team.findUnique({
     where: {

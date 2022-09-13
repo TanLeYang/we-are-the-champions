@@ -20,7 +20,6 @@ type MatchToAdd = {
 
 async function handleAddMatches(req: NextApiRequest, res: NextApiResponse) {
   const matchesToAdd: MatchToAdd[] = req.body
-  console.log(matchesToAdd)
   const teams: Map<string, number> = new Map()
 
   const getTeamId = async (teamName: string) => {
