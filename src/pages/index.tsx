@@ -1,5 +1,6 @@
 import { Box, Flex, Heading, VStack, Text, Textarea, Spacer, Button } from "@chakra-ui/react"
 import type { NextPage } from "next"
+import { useState } from "react"
 import ResultTable from "../components/ResultTable"
 
 const Home: NextPage = () => {
@@ -26,6 +27,30 @@ const Home: NextPage = () => {
     }
   ]
 
+  const [teamRegistrationText, setTeamRegistrationText] = useState("")
+
+  const handleRegisterTeams = async () => {
+    const teamsToRegister = teamRegistrationText
+      .trim()
+      .split("\n")
+      .map((line) => {
+        const [name, registrationDateStr, group] = line.split(" ")
+        return {
+          name,
+          registrationDateStr,
+          group
+        }
+      })
+
+    await fetch("/api/team", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(teamsToRegister)
+    })
+  }
+
   return (
     <>
       <Flex
@@ -45,12 +70,16 @@ const Home: NextPage = () => {
           <VStack alignItems="leading" marginBottom="5">
             <Text> Register Teams: </Text>
             <Textarea
+              value={teamRegistrationText}
+              onChange={(e) => setTeamRegistrationText(e.target.value)}
               size="md"
               placeholder="Each line: <Team Name> <Registration Date> <Group Number>"
             />
             <Flex>
               <Spacer />
-              <Button colorScheme="green"> Register </Button>
+              <Button colorScheme="green" onClick={handleRegisterTeams}>
+                Register
+              </Button>
             </Flex>
           </VStack>
           <VStack alignItems="leading">

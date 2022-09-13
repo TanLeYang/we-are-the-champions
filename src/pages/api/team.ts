@@ -1,17 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { createTeams } from "../../backend/team"
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case "POST":
-      handleCreateTeams(req, res)
+      await handleCreateTeams(req, res)
       break
   }
 }
 
 type TeamToCreate = {
   name: string
-  group: number
+  group: string
   registrationDateStr: string
 }
 
@@ -26,6 +26,7 @@ async function handleCreateTeams(req: NextApiRequest, res: NextApiResponse) {
       teams: createdTeams
     })
   } catch (e) {
+    console.error(e)
     return res.status(400).json({
       success: false,
       error: "please check that input is correct"
@@ -40,7 +41,7 @@ function parseTeam(teamToCreate: TeamToCreate) {
 
   return {
     name: teamToCreate.name,
-    group: teamToCreate.group,
+    group: parseInt(teamToCreate.group),
     registrationDate
   }
 }
