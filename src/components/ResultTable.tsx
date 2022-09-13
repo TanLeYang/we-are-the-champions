@@ -3,13 +3,14 @@ import { Result } from "../types/result"
 
 type ResultTableProps = {
   results: Result[]
+  groupNumber: number
 }
 
-const ResultTable: React.FC<ResultTableProps> = ({ results }) => {
+const ResultTable: React.FC<ResultTableProps> = ({ results, groupNumber }) => {
   return (
     <TableContainer>
       <Table variant="simple" colorScheme="teal">
-        <TableCaption> Group X results </TableCaption>
+        <TableCaption> {`Group ${groupNumber} results`} </TableCaption>
         <Thead>
           <Tr>
             <Th> Team Name </Th>

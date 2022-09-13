@@ -138,8 +138,8 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         </Box>
 
         <Flex direction="column" gap="3vh">
-          <ResultTable results={groupOneResults} />
-          <ResultTable results={groupTwoResults} />
+          <ResultTable results={groupOneResults} groupNumber={1} />
+          <ResultTable results={groupTwoResults} groupNumber={2} />
         </Flex>
       </Flex>
     </>
