@@ -1,5 +1,17 @@
 version: '3.8'
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: champions-app
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=postgresql://admin:admin@db:5432/champions-db
+    restart: always
   db:
     image: postgres:latest
     container_name: champions-postgres
