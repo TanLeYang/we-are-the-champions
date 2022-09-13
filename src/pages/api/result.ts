@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handleGetResults(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const results = await getAllMatchesWithTeams().then((matches) => computeResults(matches))
+    const results = await computeResults()
     res.status(200).json({
       success: true,
       results

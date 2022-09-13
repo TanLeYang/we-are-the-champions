@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
+import { computeResults } from "../../backend/result"
 import { createTeams } from "../../backend/team"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -20,10 +21,11 @@ async function handleCreateTeams(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const parsedTeams = teamsToCreate.map((team) => parseTeam(team))
-    const createdTeams = await createTeams(parsedTeams)
+    await createTeams(parsedTeams)
+    const newestResults = await computeResults()
     return res.status(200).json({
       success: true,
-      teams: createdTeams
+      results: newestResults
     })
   } catch (e) {
     console.error(e)

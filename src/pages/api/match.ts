@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { createMatches, getAllMatchesWithTeams } from "../../backend/match"
+import { createMatches } from "../../backend/match"
 import { computeResults } from "../../backend/result"
 import { getTeamByName } from "../../backend/team"
 
@@ -54,10 +54,10 @@ async function handleAddMatches(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     await createMatches(parsedMatches)
-    const results = await getAllMatchesWithTeams().then((matches) => computeResults(matches))
+    const newestResults = await computeResults()
     res.status(200).json({
       success: true,
-      results
+      results: newestResults
     })
   } catch (e) {
     return res.status(500).json({

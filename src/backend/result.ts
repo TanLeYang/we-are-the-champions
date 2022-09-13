@@ -1,16 +1,23 @@
 import { Team } from "@prisma/client"
-import { reverse } from "dns"
 import { Result } from "../types/result"
-import { MatchWithTeams } from "./match"
+import { getAllMatchesWithTeams, MatchWithTeams } from "./match"
+import { getAllTeams } from "./team"
 
 const TOP_N_ADVANCES = 4
 
-export async function computeResults(allMatches: MatchWithTeams[]) {
-  const groupOneMatches = allMatches.filter((m) => m.firstTeam.group == 1)
-  const groupTwoMatches = allMatches.filter((m) => m.firstTeam.group == 2)
+export async function computeResults() {
+  const [allTeams, allMatches] = await Promise.all([getAllTeams(), getAllMatchesWithTeams()])
+  return computeResultsFor(allTeams, allMatches)
+}
 
-  const groupOneResults = computeGroupResults(groupOneMatches)
-  const groupTwoResults = computeGroupResults(groupTwoMatches)
+async function computeResultsFor(allTeams: Team[], allMatches: MatchWithTeams[]) {
+  const groupOneTeams = allTeams.filter((t) => t.group === 1)
+  const groupTwoTeams = allTeams.filter((t) => t.group === 2)
+  const groupOneMatches = allMatches.filter((m) => m.firstTeam.group === 1)
+  const groupTwoMatches = allMatches.filter((m) => m.firstTeam.group === 2)
+
+  const groupOneResults = computeGroupResults(groupOneTeams, groupOneMatches)
+  const groupTwoResults = computeGroupResults(groupTwoTeams, groupTwoMatches)
 
   return {
     groupOne: groupOneResults,
@@ -18,11 +25,10 @@ export async function computeResults(allMatches: MatchWithTeams[]) {
   }
 }
 
-function computeGroupResults(groupMatches: MatchWithTeams[]) {
+function computeGroupResults(groupTeams: Team[], groupMatches: MatchWithTeams[]) {
   const teamStats: Map<string, Result> = new Map()
-
-  const updateStats = (team: Team, goalsScored: number, opponentGoalsScored: number) => {
-    let stats = teamStats.get(team.name) || {
+  groupTeams.forEach((team) => {
+    teamStats.set(team.name, {
       teamName: team.name,
       wins: 0,
       draws: 0,
@@ -32,6 +38,13 @@ function computeGroupResults(groupMatches: MatchWithTeams[]) {
       alternatePoints: 0,
       registrationDate: team.registrationDate,
       didAdvance: false
+    })
+  })
+
+  const updateStats = (team: Team, goalsScored: number, opponentGoalsScored: number) => {
+    let stats = teamStats.get(team.name)
+    if (stats === undefined) {
+      return
     }
 
     stats.goalsScored += goalsScored

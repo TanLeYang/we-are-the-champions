@@ -23,3 +23,7 @@ export async function getTeamByName(name: string) {
     }
   })
 }
+
+export async function getAllTeams() {
+  return prisma.team.findMany()
+}
