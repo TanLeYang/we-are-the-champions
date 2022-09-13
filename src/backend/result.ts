@@ -1,5 +1,4 @@
 import { Team } from "@prisma/client"
-import { Result } from "../types/result"
 import { getAllMatchesWithTeams, MatchWithTeams } from "./match"
 import { getAllTeams } from "./team"
 
@@ -26,20 +25,24 @@ async function computeResultsFor(allTeams: Team[], allMatches: MatchWithTeams[])
 }
 
 function computeGroupResults(groupTeams: Team[], groupMatches: MatchWithTeams[]) {
-  const teamStats: Map<string, Result> = new Map()
-  groupTeams.forEach((team) => {
-    teamStats.set(team.name, {
-      teamName: team.name,
-      wins: 0,
-      draws: 0,
-      losses: 0,
-      points: 0,
-      goalsScored: 0,
-      alternatePoints: 0,
-      registrationDate: team.registrationDate.toDateString(),
-      didAdvance: false
+  const teamStats = new Map(
+    groupTeams.map((team) => {
+      return [
+        team.name,
+        {
+          teamName: team.name,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          points: 0,
+          goalsScored: 0,
+          alternatePoints: 0,
+          registrationDate: team.registrationDate,
+          didAdvance: false
+        }
+      ]
     })
-  })
+  )
 
   const updateStats = (team: Team, goalsScored: number, opponentGoalsScored: number) => {
     let stats = teamStats.get(team.name)
@@ -78,11 +81,10 @@ function computeGroupResults(groupTeams: Team[], groupMatches: MatchWithTeams[])
     } else if (firstTeamStats.alternatePoints !== secondTeamStats.alternatePoints) {
       return firstTeamStats.alternatePoints - secondTeamStats.alternatePoints
     } else {
-      return firstTeamStats.registrationDate < secondTeamStats.registrationDate ? -1 : 1
+      return firstTeamStats.registrationDate > secondTeamStats.registrationDate ? -1 : 1
     }
   })
   allStats.reverse()
-
   for (let i = 0; i < TOP_N_ADVANCES; i++) {
     if (i >= allStats.length) {
       break
@@ -90,5 +92,13 @@ function computeGroupResults(groupTeams: Team[], groupMatches: MatchWithTeams[])
     allStats[i].didAdvance = true
   }
 
-  return allStats
+  const results = allStats.map((stat) => ({
+    ...stat,
+    registrationDate: stat.registrationDate.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short"
+    })
+  }))
+
+  return results
 }
