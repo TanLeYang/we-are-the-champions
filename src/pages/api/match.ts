@@ -38,7 +38,6 @@ async function handleAddMatches(req: NextApiRequest, res: NextApiResponse) {
       const secondTeamId = await getTeamId(match.secondTeamName)
       if (firstTeamId === -1 || secondTeamId === -1) {
         res.status(400).json({
-          success: false,
           error: "Non existent team name found, check input again"
         })
       }
@@ -56,12 +55,10 @@ async function handleAddMatches(req: NextApiRequest, res: NextApiResponse) {
     await createMatches(parsedMatches)
     const newestResults = await computeResults()
     res.status(200).json({
-      success: true,
       results: newestResults
     })
   } catch (e) {
     return res.status(500).json({
-      success: false,
       error: "An unknown error occured"
     })
   }
