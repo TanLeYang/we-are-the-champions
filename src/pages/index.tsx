@@ -1,4 +1,14 @@
-import { Box, Flex, Heading, VStack, Text, Textarea, Spacer, Button } from "@chakra-ui/react"
+import {
+  Box,
+  Flex,
+  Heading,
+  VStack,
+  Text,
+  Textarea,
+  Spacer,
+  Button,
+  useToast
+} from "@chakra-ui/react"
 import type { GetStaticProps, NextPage } from "next"
 import React, { useState } from "react"
 import { computeResults } from "../backend/result"
@@ -31,17 +41,22 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
   const [groupOneResults, setGroupOneResults] = useState<Result[]>(initialGroupOneResults)
   const [groupTwoResults, setGroupTwoResults] = useState<Result[]>(initialGroupTwoResults)
   const [isLoadingResults, setIsLoadingResults] = useState(false)
+  const errorToast = useToast()
 
   const postData = async (resource: string, data: any) => {
-    const resp = (await fetch(`/api/${resource}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    }).then((resp) => resp.json())) as APIResponse
+    try {
+      const resp = (await fetch(`/api/${resource}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }).then((resp) => resp.json())) as APIResponse
 
-    handleResponse(resp)
+      handleResponse(resp)
+    } catch (e) {
+      showGenericError()
+    }
   }
 
   const handleResponse = (resp: APIResponse) => {
@@ -51,9 +66,18 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         setGroupTwoResults(resp.results.groupTwo)
         break
       case false:
-        console.log(resp.error)
+        showGenericError()
         break
     }
+  }
+
+  const showGenericError = () => {
+    errorToast({
+      title: "Oops, something went wrong. Please make sure all inputs are correct",
+      status: "error",
+      duration: 3000,
+      isClosable: true
+    })
   }
 
   const handleRegisterTeams = async () => {
