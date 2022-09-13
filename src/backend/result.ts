@@ -1,5 +1,9 @@
 import { Team } from "@prisma/client"
+import { reverse } from "dns"
+import { Result } from "../types/result"
 import { MatchWithTeams } from "./match"
+
+const TOP_N_ADVANCES = 4
 
 export async function computeResults(allMatches: MatchWithTeams[]) {
   const groupOneMatches = allMatches.filter((m) => m.firstTeam.group == 1)
@@ -14,19 +18,8 @@ export async function computeResults(allMatches: MatchWithTeams[]) {
   }
 }
 
-type TeamStats = {
-  teamName: string
-  wins: number
-  draws: number
-  losses: number
-  points: number
-  totalGoals: number
-  alternatePoints: number
-  registrationDate: Date
-}
-
 function computeGroupResults(groupMatches: MatchWithTeams[]) {
-  const teamStats: Map<string, TeamStats> = new Map()
+  const teamStats: Map<string, Result> = new Map()
 
   const updateStats = (team: Team, goalsScored: number, opponentGoalsScored: number) => {
     let stats = teamStats.get(team.name) || {
@@ -35,12 +28,13 @@ function computeGroupResults(groupMatches: MatchWithTeams[]) {
       draws: 0,
       losses: 0,
       points: 0,
-      totalGoals: 0,
+      goalsScored: 0,
       alternatePoints: 0,
-      registrationDate: team.registrationDate
+      registrationDate: team.registrationDate,
+      didAdvance: false
     }
 
-    stats.totalGoals += goalsScored
+    stats.goalsScored += goalsScored
     if (goalsScored > opponentGoalsScored) {
       stats.wins += 1
       stats.points += 3
@@ -66,14 +60,22 @@ function computeGroupResults(groupMatches: MatchWithTeams[]) {
   allStats.sort((firstTeamStats, secondTeamStats) => {
     if (firstTeamStats.points !== secondTeamStats.points) {
       return firstTeamStats.points - secondTeamStats.points
-    } else if (firstTeamStats.totalGoals !== secondTeamStats.totalGoals) {
-      return firstTeamStats.totalGoals - secondTeamStats.totalGoals
+    } else if (firstTeamStats.goalsScored !== secondTeamStats.goalsScored) {
+      return firstTeamStats.goalsScored - secondTeamStats.goalsScored
     } else if (firstTeamStats.alternatePoints !== secondTeamStats.alternatePoints) {
       return firstTeamStats.alternatePoints - secondTeamStats.alternatePoints
     } else {
       return firstTeamStats.registrationDate < secondTeamStats.registrationDate ? -1 : 1
     }
   })
+  allStats.reverse()
+
+  for (let i = 0; i < TOP_N_ADVANCES; i++) {
+    if (i >= allStats.length) {
+      break
+    }
+    allStats[i].didAdvance = true
+  }
 
   return allStats
 }

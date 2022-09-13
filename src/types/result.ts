@@ -1,5 +1,6 @@
 export type Result = {
   teamName: string
+  registrationDate: Date
   wins: number
   draws: number
   losses: number

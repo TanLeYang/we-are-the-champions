@@ -13,6 +13,7 @@ const ResultTable: React.FC<ResultTableProps> = ({ results }) => {
         <Thead>
           <Tr>
             <Th> Team Name </Th>
+            <Th> Reg Date </Th>
             <Th> W </Th>
             <Th> D </Th>
             <Th> L </Th>
@@ -25,6 +26,7 @@ const ResultTable: React.FC<ResultTableProps> = ({ results }) => {
           {results.map((result, idx) => (
             <Tr key={idx} bgColor={result.didAdvance ? "teal" : ""}>
               <Td> {result.teamName} </Td>
+              <Td> {result.registrationDate.toDateString()} </Td>
               <Td> {result.wins} </Td>
               <Td> {result.draws} </Td>
               <Td> {result.losses} </Td>
