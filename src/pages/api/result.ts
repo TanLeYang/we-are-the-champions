@@ -14,11 +14,13 @@ async function handleGetResults(req: NextApiRequest, res: NextApiResponse) {
   try {
     const results = await computeResults()
     res.status(200).json({
+      success: true,
       results
     })
   } catch (e) {
     console.error(e)
     res.status(500).json({
+      success: false,
       error: "An unknown error occured"
     })
   }

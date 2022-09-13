@@ -24,11 +24,13 @@ async function handleCreateTeams(req: NextApiRequest, res: NextApiResponse) {
     await createTeams(parsedTeams)
     const newestResults = await computeResults()
     return res.status(200).json({
+      success: true,
       results: newestResults
     })
   } catch (e) {
     console.error(e)
     return res.status(400).json({
+      success: false,
       error: "please check that input is correct"
     })
   }

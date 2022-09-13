@@ -55,7 +55,7 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
     }
   }
 
-  const handleRegisterTeams = () => {
+  const handleRegisterTeams = async () => {
     const teamsToRegister = teamRegistrationText
       .trim()
       .split("\n")
@@ -68,7 +68,7 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         }
       })
 
-    postData("team", teamsToRegister)
+    await postData("team", teamsToRegister)
   }
 
   const handleSubmitMatches = async () => {
@@ -86,7 +86,7 @@ const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults 
         }
       })
 
-    postData("match", matchesToSubmit)
+    await postData("match", matchesToSubmit)
   }
 
   return (
