@@ -1,7 +1,31 @@
 import { Box, Flex, Heading, VStack, Text, Textarea, Spacer, Button } from "@chakra-ui/react"
 import type { NextPage } from "next"
+import ResultTable from "../components/ResultTable"
 
 const Home: NextPage = () => {
+  const testResults = [
+    {
+      teamName: "hello",
+      wins: 5,
+      draws: 1,
+      losses: 20,
+      points: 10,
+      goalsScored: 15,
+      alternatePoints: 20,
+      didAdvance: false
+    },
+    {
+      teamName: "bye",
+      wins: 10,
+      draws: 1,
+      losses: 9,
+      points: 100,
+      goalsScored: 35,
+      alternatePoints: 900,
+      didAdvance: true
+    }
+  ]
+
   return (
     <>
       <Flex
@@ -43,8 +67,7 @@ const Home: NextPage = () => {
         </Box>
 
         <Flex direction="column" gap="3vh">
-          <h1> Hello </h1>
-          <h1> Hello too </h1>
+          <ResultTable results={testResults} />
         </Flex>
       </Flex>
     </>
