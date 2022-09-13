@@ -1,16 +1,61 @@
 import { Box, Flex, Heading, VStack, Text, Textarea, Spacer, Button } from "@chakra-ui/react"
-import type { NextPage } from "next"
-import { useState } from "react"
+import type { GetStaticProps, NextPage } from "next"
+import React, { useState } from "react"
+import { computeResults } from "../backend/result"
 import ResultTable from "../components/ResultTable"
 import { Result } from "../types/result"
 
-const Home: NextPage = () => {
+type SuccessResponse = {
+  success: true
+  results: {
+    groupOne: Result[]
+    groupTwo: Result[]
+  }
+}
+
+type ErrorResponse = {
+  success: false
+  error: string
+}
+
+type APIResponse = SuccessResponse | ErrorResponse
+
+type Props = {
+  initialGroupOneResults: Result[]
+  initialGroupTwoResults: Result[]
+}
+
+const Home: NextPage<Props> = ({ initialGroupOneResults, initialGroupTwoResults }) => {
   const [teamRegistrationText, setTeamRegistrationText] = useState("")
   const [matchesText, setMatchesText] = useState("")
-  const [groupOneResults, setGroupOneResults] = useState<Result[]>([])
-  const [groupTwoResults, setGroupTwoResults] = useState<Result[]>([])
+  const [groupOneResults, setGroupOneResults] = useState<Result[]>(initialGroupOneResults)
+  const [groupTwoResults, setGroupTwoResults] = useState<Result[]>(initialGroupTwoResults)
 
-  const handleRegisterTeams = async () => {
+  const postData = async (resource: string, data: any) => {
+    const resp = (await fetch(`/api/${resource}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    }).then((resp) => resp.json())) as APIResponse
+
+    handleResponse(resp)
+  }
+
+  const handleResponse = (resp: APIResponse) => {
+    switch (resp.success) {
+      case true:
+        setGroupOneResults(resp.results.groupOne)
+        setGroupTwoResults(resp.results.groupTwo)
+        break
+      case false:
+        console.log(resp.error)
+        break
+    }
+  }
+
+  const handleRegisterTeams = () => {
     const teamsToRegister = teamRegistrationText
       .trim()
       .split("\n")
@@ -23,13 +68,7 @@ const Home: NextPage = () => {
         }
       })
 
-    await fetch("/api/team", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(teamsToRegister)
-    })
+    postData("team", teamsToRegister)
   }
 
   const handleSubmitMatches = async () => {
@@ -47,17 +86,7 @@ const Home: NextPage = () => {
         }
       })
 
-    const resp = await fetch("/api/match", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(matchesToSubmit)
-    }).then((resp) => resp.json())
-
-    const { results } = resp
-    setGroupOneResults(results.groupOne)
-    setGroupTwoResults(results.groupTwo)
+    postData("match", matchesToSubmit)
   }
 
   return (
@@ -115,6 +144,17 @@ const Home: NextPage = () => {
       </Flex>
     </>
   )
+}
+
+export const getStaticProps: GetStaticProps<Props> = async (context) => {
+  const results = await computeResults()
+
+  return {
+    props: {
+      initialGroupOneResults: results.groupOne,
+      initialGroupTwoResults: results.groupTwo
+    }
+  }
 }
 
 export default Home

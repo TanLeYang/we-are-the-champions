@@ -36,7 +36,7 @@ function computeGroupResults(groupTeams: Team[], groupMatches: MatchWithTeams[])
       points: 0,
       goalsScored: 0,
       alternatePoints: 0,
-      registrationDate: team.registrationDate,
+      registrationDate: team.registrationDate.toDateString(),
       didAdvance: false
     })
   })
